@@ -1,0 +1,39 @@
+import { BarChart3, Package, Plus, Settings } from 'lucide-react'
+import Link from 'next/link'
+
+export default function Sidebar({
+    currentPath }:
+    { currentPath: string }) {
+    const navigation = [
+        { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
+        { name: 'Inventory', href: '/inventory', icon: Package },
+        { name: 'Add Product', href: '/add_product', icon: Plus },
+        { name: 'Setting', href: '/setting', icon: Settings },
+    ]
+    return (
+        <div className='fixed left-0 top-0 bg-gray-900 text-white w-64 min-h-screen p-6 z-10'>
+            <div className="mb-8">
+                <div className="flex items-center space-x-2 mb-4">
+                    <BarChart3 className="h-7 w-7 text-blue-500" />
+                </div>
+                <span className="text-lg font-semibold">Inventory App</span>
+            </div>
+            <nav className='space-y-1'>
+                <div className="text-sm font-semibold text-gray-400 uppercase">Inventory</div>
+                {
+                    navigation.map((item, key) => {
+                        const IconComponent = item.icon
+                        return (
+                            <Link href={item.href} key={key} className='flex items-center space-x-3 py-2'>
+                                <IconComponent className="h-5 w-5" />
+                                <span className='text-sm'>{item.name}</span>
+                            </Link>)
+                    })
+                }
+
+
+
+            </nav>
+        </div>
+    )
+}
