@@ -1,3 +1,4 @@
+import { UserButton } from '@stackframe/stack'
 import { BarChart3, Package, Plus, Settings } from 'lucide-react'
 import Link from 'next/link'
 
@@ -23,17 +24,23 @@ export default function Sidebar({
                 {
                     navigation.map((item, key) => {
                         const IconComponent = item.icon
+                        const isActive = currentPath === item.href
                         return (
-                            <Link href={item.href} key={key} className='flex items-center space-x-3 py-2'>
+                            <Link
+                                href={item.href} key={key}
+                                className={`flex items-center space-x-3 py-2 px-3 rounded-lg ${isActive ? 'bg-purple-100 text-gray-800' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}
+                            >
                                 <IconComponent className="h-5 w-5" />
                                 <span className='text-sm'>{item.name}</span>
                             </Link>)
                     })
                 }
-
-
-
             </nav>
+            <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-700">
+                <div className="flex items-center justify-between mb-4">
+                   <UserButton showUserInfo/> 
+                </div>
+            </div>
         </div>
     )
 }
