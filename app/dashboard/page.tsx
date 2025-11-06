@@ -7,20 +7,21 @@ import React from 'react'
 export default async function DashboardPage() {
     const user = await getCurrentUser();
     const userId = user.id;
-    const[totalProducts,lowStock,allProducts]=await Promise.all([
+    const [totalProducts, lowStock, allProducts] = await Promise.all([
         Prisma.product.count({ where: { userId } }),
         Prisma.product.count({
-        where: {
-            userId,
-            lowStockAt: { not: null }, quantity: { lte: 5 }
-        }}),
+            where: {
+                userId,
+                lowStockAt: { not: null }, quantity: { lte: 5 }
+            }
+        }),
         Prisma.product.findMany({ where: { userId }, select: { price: true, createdAt: true, quantity: true } })
 
     ])
 
-   
+
     const totalValue = allProducts.reduce((sum, product) => sum + Number(product.price) * Number(product.quantity), 0);
-    
+
     const recent = await Prisma.product.findMany({
         where: { userId },
         orderBy: { createdAt: 'desc' },
@@ -69,6 +70,31 @@ export default async function DashboardPage() {
                                 </div>
 
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    {/* stock Level */}
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className='text-lg font-semibold text-gray-900'>Stock Level</h2>
+                        </div>
+                        <div className="space-y-3">
+                            {recent.map((product, key) => {
+                                const stockLevel = product.quantity === 0 ? 0 : product.quantity <= (product.lowStockAt || 5) ? 1 : 2
+                                const bgColor = ['bg-red-500', 'bg-yellow-400', 'bg-green-500']
+                                const textColor = ['text-red-800', 'text-yellow-600', 'text-green-800']
+                                return (
+                                    <div key={key} className="flex items-center justify-between p-3 rounded-lg bg-gray-50">
+                                        <div className="flex items-center space-x-3">
+                                            <div className={`w-3 h-3 rounded-full ${bgColor[stockLevel]}`}/>
+                                            <span className='text-sm font-medium text-gray-900'>{product.name}</span>
+                                        </div>
+                                        <div className={`text-sm font-medium ${textColor[stockLevel]}`}>{product.quantity} units</div>
+                                    </div>
+                                )
+                            })}
+
                         </div>
                     </div>
                 </div>
