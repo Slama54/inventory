@@ -7,17 +7,18 @@ import React from 'react'
 export default async function DashboardPage() {
     const user = await getCurrentUser();
     const userId = user.id;
-
-    
-    const totalProducts = await Prisma.product.count({ where: { userId } })
-    const lowStock = await Prisma.product.count({
+    const[totalProducts,lowStock,allProducts]=await Promise.all([
+        Prisma.product.count({ where: { userId } }),
+        Prisma.product.count({
         where: {
             userId,
             lowStockAt: { not: null }, quantity: { lte: 5 }
-        }
-    })
+        }}),
+        Prisma.product.findMany({ where: { userId }, select: { price: true, createdAt: true, quantity: true } })
 
-    const allProducts = await Prisma.product.findMany({ where: { userId }, select: { price: true, createdAt: true, quantity: true } })
+    ])
+
+   
     const totalValue = allProducts.reduce((sum, product) => sum + Number(product.price) * Number(product.quantity), 0);
     
     const recent = await Prisma.product.findMany({
